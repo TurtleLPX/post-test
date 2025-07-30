@@ -1,6 +1,11 @@
 import streamlit as st
 
-st.set_page_config(page_title="品牌專屬 AI 工具箱", layout="wide")
+# 強制 sidebar 一開始展開
+st.set_page_config(
+    page_title="品牌專屬 AI 工具箱",
+    layout="wide",
+    initial_sidebar_state="expanded"  # 👈 加這個
+)
 
 st.title("🧠 品牌專屬 AI 工具箱")
 st.markdown("""
