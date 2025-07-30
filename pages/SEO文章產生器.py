@@ -1,6 +1,3 @@
-"""
-# 📄 長文產生器
-"""
 from utils.ui import inject_css
 from utils.state import init_session
 inject_css()
