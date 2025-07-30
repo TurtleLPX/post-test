@@ -5,9 +5,10 @@ init_session()
 import streamlit as st
 import requests
 import time
+import threading
 
 # 💄 設定頁面與主題配色
-st.set_page_config(page_title="品牌專屬 AI 機器人", layout="wide")
+st.set_page_config(page_title="SEO文章產生器", layout="wide")
 
 # 🎨 主題顏色
 PRIMARY = "#ab452b"
@@ -62,7 +63,7 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown(f"# <span style='color:{PRIMARY}'>品牌專屬 AI 機器人</span>", unsafe_allow_html=True)
+st.markdown(f"# <span style='color:{PRIMARY}'>SEO文章產生器</span>", unsafe_allow_html=True)
 
 # Webhook URLs
 N8N_BASE_URL = "https://turtlelu.zeabur.app/webhook-test"
@@ -88,26 +89,23 @@ with st.form("article_form"):
 介紹超便宜搬家學生搬家服務，並附上聯繫資訊 (附上地址、官網／FB／Google 商家連結、Line/電話聯繫方式)""")
     generate = st.form_submit_button("產生草稿")
 
-if generate:
-    status_placeholder = st.empty()
-    status_placeholder.info("✍️ AI 正在撰寫草稿中...")
+    if generate:
+        status_placeholder = st.empty()
+        status_placeholder.info("✍️ AI 正在撰寫草稿中...")
 
-    time.sleep(20)  # 前 20 秒提示為草稿中
-    status_placeholder.info("🤖 AI 正在潤稿中...")
-
-    try:
-        res = requests.post(GENERATE_URL, json={
-            "title": title,
-            "keywords": keywords,
-            "outline": outline
-        })
-        res.raise_for_status()
-        data = res.json()
-        content = data.get("content", "")
-        st.session_state["article_draft"] = content
-        status_placeholder.success("✅ 草稿產出成功！")
-    except Exception as e:
-        status_placeholder.error(f"❌ 草稿產出失敗：{e}")
+        try:
+            res = requests.post(GENERATE_URL, json={
+                "title": title,
+                "keywords": keywords,
+                "outline": outline
+            })
+            res.raise_for_status()
+            data = res.json()
+            content = data.get("content", "")
+            st.session_state["article_draft"] = content
+            status_placeholder.success("✅ 草稿產出成功！")
+        except Exception as e:
+            status_placeholder.error(f"❌ 草稿產出失敗：{e}")
 
 # ──────────────
 # 步驟 2：預覽草稿 + AI 助理 + 儲存（合併並美化）
@@ -170,11 +168,11 @@ if st.session_state["article_draft"]:
                     if save_res is not None:
                         st.text(save_res.text)
 
-    # ✅ 成功後顯示卡片（移到區塊外，不會遮住按鈕）
-    if st.session_state.get("doc_saved"):
-        st.markdown(f"""
-        <div style="background-color:#f0f8f3; border-left: 6px solid #34a853; padding: 1rem; border-radius: 6px; margin-top: 1.5rem;">
-            <p style="margin:0;">📄 <strong>文件已建立成功：</strong> {st.session_state.get("doc_name", "")}</p>
-            <p style="margin:0;">👉 <a href="{st.session_state.get("doc_url", "#")}" target="_blank" style="color:#2b6cb0;font-weight:bold;">點我查看 Google 文件</a></p>
-        </div>
-        """, unsafe_allow_html=True)
+# ✅ 成功後顯示卡片（移到區塊外，不會遮住按鈕）
+if st.session_state.get("doc_saved"):
+    st.markdown(f"""
+    <div style="background-color:#f0f8f3; border-left: 6px solid #34a853; padding: 1rem; border-radius: 6px; margin-top: 1.5rem;">
+        <p style="margin:0;">📄 <strong>文件已建立成功：</strong> {st.session_state.get("doc_name", "")}</p>
+        <p style="margin:0;">👉 <a href="{st.session_state.get("doc_url", "#")}" target="_blank" style="color:#2b6cb0;font-weight:bold;">點我查看 Google 文件</a></p>
+    </div>
+    """, unsafe_allow_html=True)
